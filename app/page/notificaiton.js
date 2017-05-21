@@ -24,8 +24,8 @@ Notifications.configure({
 
     // (required) Called when a remote or local notification is opened or received
     onNotification: function (notification) {
-        //PushNotification.cancelAllLocalNotifications()
-        //PushNotification.cancelLocalNotifications(notification);
+        //Notifications.cancelAllLocalNotifications()
+        //Notifications.cancelLocalNotifications(notification);
         console.log('NOTIFICATION:', notification);
 
         AlertIOS.alert(
@@ -87,6 +87,13 @@ class Button extends React.Component {
 }
 
 export default class NotificationExample extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            permissions: null
+        }
+    }
+
     componentWillMount() {
         PushNotificationIOS.addEventListener('register', this._onRegistered);
         PushNotificationIOS.addEventListener('registrationError', this._onRegistrationError);
@@ -111,8 +118,29 @@ export default class NotificationExample extends React.Component {
                     onPress={this._sendLocalNotification}
                     label="Send fake local notification"
                     />
+                <Button
+                    onPress={() => Notifications.setApplicationIconBadgeNumber(42)}
+                    label="Set app's icon badge to 42"
+                    />
+                <Button
+                    onPress={() => Notifications.setApplicationIconBadgeNumber(0)}
+                    label="Clear app's icon badge"
+                    />
+                <Button
+                    onPress={this._showPermissions.bind(this)}
+                    label="Show enabled permissions"
+                    />
+                <Text>
+                    {JSON.stringify(this.state.permissions)}
+                </Text>
             </View>
         );
+    }
+
+    _showPermissions() {
+        PushNotificationIOS.checkPermissions((permissions) => {
+            this.setState({permissions});
+        });
     }
 
     _sendNotification() {
@@ -129,9 +157,9 @@ export default class NotificationExample extends React.Component {
     _sendLocalNotification() {
         Notifications.getApplicationIconBadgeNumber((badge) => {
             Notifications.localNotificationSchedule({
-                message: "My Notification Message", // (required)
+                message: "10秒后发出的通知", // (required)
                 number: badge + 1,
-                userInfo: {"hello": "world"},
+                userInfo: {id:'affair.schedule', "hello": "world"},
                 date: new Date(Date.now() + (10 * 1000)) // in 10 secs
             });
         });
@@ -149,7 +177,7 @@ export default class NotificationExample extends React.Component {
             vibrate: true, // (optional) default: true
             vibration: 300, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
             //tag: 'some_tag', // (optional) add tag to message
-            group: "com.duoshouji", // (optional) add group to message
+            group: "org.reactjs.native.example", // (optional) add group to message
             ongoing: false, // (optional) set whether this is an "ongoing" notification
 
             /* iOS only properties */
@@ -160,11 +188,12 @@ export default class NotificationExample extends React.Component {
             /* iOS and Android properties */
             title: "剁手记本地通知准备就绪", // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
             message: "您有新的剁手记本地通知", // (required)
-            playSound: false, // (optional) default: true
+            playSound: true, // (optional) default: true
             soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
             number: 1, // (optional, deprecated in android API 24) Valid 32 bit integer specified as string. default: none (Cannot be zero)
             //repeatType: 'day', // (Android only) Repeating interval. Could be one of `week`, `day`, `hour`, `minute, `time`. If specified as time, it should be accompanied by one more parameter 'repeatTime` which should the number of milliseconds between each interval
             //actions: '["Yes", "No"]'  // (Android only) See the doc for notification actions to know more
+            userInfo: {id:'affair.schedule', "hello": "world"},
         });
     }
 
@@ -192,35 +221,6 @@ export default class NotificationExample extends React.Component {
 
 }
 
-class NotificationPermissionExample extends React.Component {
-    state: any;
-
-    constructor(props) {
-        super(props);
-        this.state = {permissions: null};
-    }
-
-    render() {
-        return (
-            <View>
-                <Button
-                    onPress={this._showPermissions.bind(this)}
-                    label="Show enabled permissions"
-                    />
-                <Text>
-                    {JSON.stringify(this.state.permissions)}
-                </Text>
-            </View>
-        );
-    }
-
-    _showPermissions() {
-        PushNotificationIOS.checkPermissions((permissions) => {
-            this.setState({permissions});
-        });
-    }
-}
-
 var styles = StyleSheet.create({
     button: {
         padding: 10,
@@ -231,39 +231,7 @@ var styles = StyleSheet.create({
         color: 'blue',
     },
     container: {
-        marginTop: 44 /*navigator height*/
+        marginTop: 44 /*navigator height*/,
+        alignItems: 'center'
     }
 });
-
-exports.title = 'PushNotificationIOS';
-exports.description = 'Apple PushNotification and badge value';
-exports.examples = [
-    {
-        title: 'Badge Number',
-        render(): React.Element<any> {
-            return (
-                <View>
-                    <Button
-                        onPress={() => PushNotificationIOS.setApplicationIconBadgeNumber(42)}
-                        label="Set app's icon badge to 42"
-                        />
-                    <Button
-                        onPress={() => PushNotificationIOS.setApplicationIconBadgeNumber(0)}
-                        label="Clear app's icon badge"
-                        />
-                </View>
-            );
-        },
-    },
-    {
-        title: 'Push Notifications',
-        render(): React.Element<any> {
-            return <NotificationExample />;
-        }
-    },
-    {
-        title: 'Notifications Permissions',
-        render(): React.Element<any> {
-            return <NotificationPermissionExample />;
-        }
-    }];
