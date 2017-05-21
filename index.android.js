@@ -3,51 +3,53 @@
  * https://github.com/facebook/react-native
  * @flow
  */
+'use strict';
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
 
-export default class ReactNativeDemos extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
-  }
-}
+import App from './app/app';
+import Notifications from 'react-native-push-notification';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+Notifications.configure({
+
+  // (optional) Called when Token is generated (iOS and Android)
+  onRegister: function(token) {
+    console.log( 'TOKEN:', token );
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+
+  // (required) Called when a remote or local notification is opened or received
+  onNotification: function(notification) {
+    //PushNotification.cancelAllLocalNotifications()
+    //PushNotification.cancelLocalNotifications(notification);
+    console.log( 'NOTIFICATION:', notification );
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+
+  // ANDROID ONLY: GCM Sender ID (optional - not required for local notifications, but is need to receive remote push notifications)
+  senderID: "141041616019",
+
+  // IOS ONLY (optional): default: all - Permissions to register.
+  permissions: {
+    alert: true,
+    badge: true,
+    sound: true
   },
+
+  // Should the initial notification be popped automatically
+  // default: true
+  popInitialNotification: true,
+
+  /**
+   * (optional) default: true
+   * - Specified if permissions (ios) and token (android and ios) will requested or not,
+   * - if not, you must call PushNotificationsHandler.requestPermissions() later
+   */
+  requestPermissions: true,
 });
 
-AppRegistry.registerComponent('ReactNativeDemos', () => ReactNativeDemos);
+AppRegistry.registerComponent('ReactNativeDemos', () => App);

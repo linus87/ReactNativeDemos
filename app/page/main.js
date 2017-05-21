@@ -1,5 +1,5 @@
 /**
- * Created by lyan2 on 17/5/17.
+ * Created by lyan2 on 17/5/20.
  */
 'use strict';
 
@@ -12,12 +12,18 @@ import {
     View
 } from 'react-native';
 import Notifications from 'react-native-push-notification';
-import Navigator from './navigator.js';
+import {pages} from '../pages.js';
 
-export default class App extends React.Component {
+export default class Main extends React.Component {
     constructor(props) {
         super(props);
+        console.log(this);
+        console.log(pages);
+        var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => {
+            r1.id !== r2.id;
+        }});
         this.state = {
+            dataSource: ds.cloneWithRows(pages),
             permissions: null
         }
     }
@@ -66,25 +72,55 @@ export default class App extends React.Component {
         //    //repeatType: 'day', // (Android only) Repeating interval. Could be one of `week`, `day`, `hour`, `minute, `time`. If specified as time, it should be accompanied by one more parameter 'repeatTime` which should the number of milliseconds between each interval
         //    //actions: '["Yes", "No"]'  // (Android only) See the doc for notification actions to know more
         //});
-        //
-        //require('RCTDeviceEventEmitter').emit('remoteNotificationReceived', {
-        //    aps: {
-        //        alert: 'Sample notification',
-        //        badge: '+1',
-        //        sound: 'default',
-        //        category: 'REACT_NATIVE'
-        //    },
-        //});
     }
 
     render() {
         return (
-            <View style={[styles.container]}>
-                <Navigator />
-            </View>
+            <ListView style={{backgroundColor:'#f00'}}
+                      contentContainerStyle={{backgroundColor:'#00f'}}
+                      dataSource={this.state.dataSource}
+                      renderRow={this._renderRow.bind(this)}
+                      renderSeparator={this._renderSeparator}
+                />
         );
     }
 
+    _renderRow (rowData, sectionID, rowID, highlightRow) {
+        return (
+            <TouchableHighlight onPress={() => {
+                this._pressRow(rowData);
+                highlightRow(sectionID, rowID);
+            }}>
+                <View>
+                    <View style={styles.row}>
+                        <Text style={styles.text}>
+                            {rowData.label}
+                        </Text>
+                    </View>
+                </View>
+            </TouchableHighlight>
+        );
+    }
+
+    _renderSeparator (sectionID, rowID, adjacentRowHighlighted) {
+        return (
+            <View
+                key={`${sectionID}-${rowID}`}
+                style={{
+                    height: adjacentRowHighlighted ? 4 : 1,
+                    backgroundColor: adjacentRowHighlighted ? '#3B5998' : '#CCCCCC',
+                }}/>
+        );
+    }
+
+    _pressRow (rowData) {
+        var {navigator} = this.props;
+        console.log(navigator);
+        if (navigator) {
+            navigator.push(rowData.route);
+        }
+
+    }
 }
 
 const styles = StyleSheet.create({
