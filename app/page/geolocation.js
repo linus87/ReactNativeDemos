@@ -24,7 +24,8 @@ export default class GeolocationPage extends React.Component {
             dataSource: ds,
             initialPosition: 'unknown',
             lastPosition: 'unknown',
-            address: '正在定位'
+            address: '正在定位',
+            modalVisible: true
         }
     }
 
@@ -51,7 +52,8 @@ export default class GeolocationPage extends React.Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             let {formatted_address} = responseJson.result;
-                            this.setState({address: formatted_address || '定位失败', latitude: coords.x, longitude: coords.y});
+                            this.setState({dataSource: this.state.dataSource.cloneWithRows(responseJson.result.pois),
+                                address: formatted_address || '定位失败', latitude: coords.x, longitude: coords.y});
                         })
                         .catch((error) => {
                             Toast.show(JSON.stringify(error), {duration: Toast.durations.SHORT, position: Toast.positions.CENTER});
@@ -91,12 +93,10 @@ export default class GeolocationPage extends React.Component {
                 this._pressAddressRow(rowData);
                 highlightRow(sectionID, rowID);
             }}>
-                <View>
-                    <View style={styles.row}>
-                        <Text style={styles.text}>
-                            {rowData.label}
-                        </Text>
-                    </View>
+                <View style={styles.addressRow}>
+                    <Text>
+                        {rowData.addr}
+                    </Text>
                 </View>
             </TouchableHighlight>
         );
@@ -107,19 +107,14 @@ export default class GeolocationPage extends React.Component {
             <View
                 key={`${sectionID}-${rowID}`}
                 style={{
-                    height: adjacentRowHighlighted ? 4 : 1,
+                    height: adjacentRowHighlighted ? 2 : 1,
                     backgroundColor: adjacentRowHighlighted ? '#3B5998' : '#CCCCCC',
                 }}/>
         );
     }
 
     _pressAddressRow (rowData) {
-        var {navigator} = this.props;
-        console.log(navigator);
-        if (navigator) {
-            navigator.push(rowData.route);
-        }
-
+        this.setState({modalVisible:false, address:rowData.addr});
     }
 
     render() {
@@ -127,9 +122,7 @@ export default class GeolocationPage extends React.Component {
             <View style={styles.container}>
                 <Modal visible={this.state.modalVisible} animationType={"slide"} transparent={false}>
                     <View style={{marginTop: 22}}>
-                        <ListView style={{backgroundColor:'#f00'}}
-                                  contentContainerStyle={{backgroundColor:'#00f'}}
-                                  dataSource={this.state.dataSource}
+                        <ListView dataSource={this.state.dataSource}
                                   renderRow={this._renderAddressRow.bind(this)}
                                   renderSeparator={this._renderSeparator}
                             />
@@ -143,7 +136,7 @@ export default class GeolocationPage extends React.Component {
                     <Text style={styles.title}>Current position: </Text>
                     {JSON.stringify(this.state.lastPosition)}
                 </Text>
-                <Text onPress={() => {console.log('Pressed on address');}}>
+                <Text onPress={() => {this.setState({modalVisible:true})}}>
                     {this.state.address}
                 </Text>
             </View>
@@ -159,4 +152,8 @@ var styles = StyleSheet.create({
     title: {
         fontWeight: '500',
     },
+    addressRow: {
+        paddingVertical: 10,
+        paddingHorizontal: 10
+    }
 });
