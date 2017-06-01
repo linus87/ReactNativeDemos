@@ -13,6 +13,7 @@ var {
     TouchableHighlight,
     View,
     } = ReactNative;
+import AddressModel from '../modules/AddressModel.js';
 
 export default class GeolocationPage extends React.Component {
     constructor(props) {
@@ -21,11 +22,11 @@ export default class GeolocationPage extends React.Component {
             r1.addr !== r2.addr;
         }});
         this.state = {
-            dataSource: ds,
+            addressDataSource: ds,
             initialPosition: 'unknown',
             lastPosition: 'unknown',
             address: '正在定位',
-            modalVisible: true
+            modalVisible: false
         }
     }
 
@@ -52,8 +53,8 @@ export default class GeolocationPage extends React.Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             let {formatted_address} = responseJson.result;
-                            this.setState({dataSource: this.state.dataSource.cloneWithRows(responseJson.result.pois),
-                                address: formatted_address || '定位失败', latitude: coords.x, longitude: coords.y});
+                            this.setState({addressDataSource: this.state.addressDataSource.cloneWithRows(responseJson.result.pois),
+                                address: formatted_address || '定位失败', latitude: coords.x, longitude: coords.y, modalVisible:true});
                         })
                         .catch((error) => {
                             Toast.show(JSON.stringify(error), {duration: Toast.durations.SHORT, position: Toast.positions.CENTER});
@@ -87,47 +88,15 @@ export default class GeolocationPage extends React.Component {
         navigator.geolocation.clearWatch(this.watchID);
     }
 
-    _renderAddressRow (rowData, sectionID, rowID, highlightRow) {
-        return (
-            <TouchableHighlight onPress={() => {
-                this._pressAddressRow(rowData);
-                highlightRow(sectionID, rowID);
-            }}>
-                <View style={styles.addressRow}>
-                    <Text>
-                        {rowData.addr}
-                    </Text>
-                </View>
-            </TouchableHighlight>
-        );
-    }
-
-    _renderSeparator (sectionID, rowID, adjacentRowHighlighted) {
-        return (
-            <View
-                key={`${sectionID}-${rowID}`}
-                style={{
-                    height: adjacentRowHighlighted ? 2 : 1,
-                    backgroundColor: adjacentRowHighlighted ? '#3B5998' : '#CCCCCC',
-                }}/>
-        );
-    }
-
-    _pressAddressRow (rowData) {
+    _onAddressSelect (rowData) {
         this.setState({modalVisible:false, address:rowData.addr});
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <Modal visible={this.state.modalVisible} animationType={"slide"} transparent={false}>
-                    <View style={{marginTop: 22}}>
-                        <ListView dataSource={this.state.dataSource}
-                                  renderRow={this._renderAddressRow.bind(this)}
-                                  renderSeparator={this._renderSeparator}
-                            />
-                    </View>
-                </Modal>
+                <AddressModel dataSource={this.state.addressDataSource} visible={this.state.modalVisible}
+                    onSelect={this._onAddressSelect.bind(this)} />
                 <Text>
                     <Text style={styles.title}>Initial position: </Text>
                     {JSON.stringify(this.state.initialPosition)}
