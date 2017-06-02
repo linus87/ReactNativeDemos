@@ -42,6 +42,7 @@ export default class GeolocationPage extends React.Component {
         let {coords} = position;
         if (!position || !coords) return;
 
+        let address = '定位失败';
         let url = 'http://api.map.baidu.com/geoconv/v1/?from=1&to=5&ak=D8c7c1411571551ef8fe556f08c594bd&coords=' + coords.longitude + ',' + coords.latitude;
         fetch(url, {method:'GET'})
             .then((response) => response.json())
@@ -53,17 +54,18 @@ export default class GeolocationPage extends React.Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             let {formatted_address} = responseJson.result;
-                            this.setState({addressDataSource: this.state.addressDataSource.cloneWithRows(responseJson.result.pois),
-                                address: formatted_address || '定位失败', latitude: coords.x, longitude: coords.y, modalVisible:true});
+                            let pois = [].concat([{addr:formatted_address}]).concat(responseJson.result.pois);
+                            this.setState({addressDataSource: this.state.addressDataSource.cloneWithRows(pois),
+                                address: formatted_address || address, latitude: coords.x, longitude: coords.y, modalVisible:true});
                         })
                         .catch((error) => {
                             Toast.show(JSON.stringify(error), {duration: Toast.durations.SHORT, position: Toast.positions.CENTER});
-                            this.setState({address: '定位失败'});
+                            this.setState({address: address});
                         });
                 }
             }).catch((error) => {
                 Toast.show(JSON.stringify(error), {duration: Toast.durations.SHORT, position: Toast.positions.CENTER});
-                that.setState({address: '定位失败'});
+                this.setState({address: address});
             });
     }
 
