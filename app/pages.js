@@ -5,7 +5,8 @@
 
 import NotificationPage from './page/notificaiton.js';
 import GeolocationPage from './page/geolocation.js';
+import WebViewPage from './page/webview.js';
 
 export var pages = [{id:"notification", label:"Push Notification", route:{component:NotificationPage, title:'Notification Demo'}},
     {id:"geolocation", label:"Geolocation Baidu", route:{component:GeolocationPage, title:'Geolocation Demo'}},
-    {id:"button", label:"Hello World", route:""}];
+    {id:"webview", label:"WebView", route:{component:WebViewPage, title:'WebView Demo'}}];
