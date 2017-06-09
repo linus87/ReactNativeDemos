@@ -14,6 +14,7 @@ var {
     TouchableHighlight,
     View,
     } = ReactNative;
+import Button from '../components/Button.js';
 
 Notifications.configure({
 
@@ -70,21 +71,6 @@ Notifications.configure({
      */
     requestPermissions: true,
 });
-
-class Button extends React.Component {
-    render() {
-        return (
-            <TouchableHighlight
-                underlayColor={'white'}
-                style={styles.button}
-                onPress={this.props.onPress}>
-                <Text style={styles.buttonLabel}>
-                    {this.props.label}
-                </Text>
-            </TouchableHighlight>
-        );
-    }
-}
 
 export default class NotificationExample extends React.Component {
     constructor(props) {
@@ -222,14 +208,6 @@ export default class NotificationExample extends React.Component {
 }
 
 var styles = StyleSheet.create({
-    button: {
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonLabel: {
-        color: 'blue',
-    },
     container: {
         marginTop: 44 /*navigator height*/,
         alignItems: 'center'

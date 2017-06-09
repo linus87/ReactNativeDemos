@@ -15,6 +15,7 @@ var {
     View,
     WebView
     } = ReactNative;
+import Button from '../components/Button.js';
 
 var WEBVIEW_REF = 'webview';
 
@@ -22,7 +23,7 @@ export default class WebViewPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            count: 0
         }
     }
 
@@ -34,12 +35,16 @@ export default class WebViewPage extends React.Component {
     }
 
     _onLoad() {
-        this.refs[WEBVIEW_REF].postMessage("WebView loaded");
+        this.refs[WEBVIEW_REF].postMessage("Web view loaded");
+    }
+
+    _onPress() {
+        this.refs[WEBVIEW_REF].postMessage(this.state.count++);
     }
 
     _onMessage(event) {
         Alert.alert(
-            'Alert Title',
+            'Across Document Message',
             event.nativeEvent.data,
             [
                 {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
@@ -55,26 +60,32 @@ export default class WebViewPage extends React.Component {
         var source = require('../html/messagetest.html');
 
         return (
-            <WebView ref={WEBVIEW_REF}
-                     source={source}
-                     onLoad={this._onLoad.bind(this)}
-                     javaScriptEnabled={true}
-                     domStorageEnabled={true}
-                     startInLoadingState={true}
-                     onMessage={this._onMessage}
-                >
-
-            </WebView>
+            <View style={styles.container}>
+                <Button onPress={this._onPress.bind(this)} label="Send Message"></Button>
+                <WebView ref={WEBVIEW_REF}
+                         source={source}
+                         style={styles.webView}
+                         onLoad={this._onLoad.bind(this)}
+                         /*Controls whether to adjust the content inset for web views that are placed behind a navigation bar, tab bar, or toolbar. The default value is true.*/
+                         automaticallyAdjustContentInsets={false}
+                         javaScriptEnabled={true}
+                         domStorageEnabled={true}
+                         startInLoadingState={true}
+                         onMessage={this._onMessage}
+                    >
+                </WebView>
+            </View>
         );
     }
 }
 
 var styles = StyleSheet.create({
-    title: {
-        fontWeight: '500',
+    container: {
+        marginTop: 44,
+        //alignItems: 'stretch',
+        flex:1
     },
-    addressRow: {
-        paddingVertical: 10,
-        paddingHorizontal: 10
-    }
+    webView: {
+        backgroundColor: '#0ff'
+    },
 });

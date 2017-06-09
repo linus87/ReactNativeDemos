@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <title></title>
 </head>
-<body>
-    message test
+<body style="background-color:#f00;margin:0;">
+    <div id="hello">message test</div>
     <script>
-        alert(this);
-        window.postMessage("hello world");
-        alert(this);
+        var divElement = document.getElementById("hello");
+
+        document.addEventListener('message', function(e){
+            divElement.innerHTML = e.data;
+        }, false);
+
+        document.getElementById('hello').addEventListener('click', function(){
+            window.postMessage('from message', '*');
+        });
     </script>
 </body>
 </html>
