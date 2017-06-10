@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <title></title>
 </head>
-<body style="background-color:#f00;margin:0;">
-    <div id="hello">message test</div>
+<body style="background-color:#f00;margin:8px;text-align:center;">
+    <div id="message-div" style="text-align:center;margin-bottom:20px;">message test</div>
+    <button id="btn">Send Back</button>
     <script>
-        var divElement = document.getElementById("hello");
+        var divElement = document.getElementById("message-div");
 
         document.addEventListener('message', function(e){
-            divElement.innerHTML = e.data;
+            divElement.innerHTML = 'Message from WebView: ' + e.data;
         }, false);
 
-        document.getElementById('hello').addEventListener('click', function(){
-            window.postMessage('from message', '*');
+        document.getElementById('btn').addEventListener('click', function(){
+            window.postMessage('message from HTML page');
         });
     </script>
 </body>

@@ -61,6 +61,7 @@ export default class WebViewPage extends React.Component {
 
         return (
             <View style={styles.container}>
+                <Text></Text>
                 <Button onPress={this._onPress.bind(this)} label="Send Message"></Button>
                 <WebView ref={WEBVIEW_REF}
                          source={source}
