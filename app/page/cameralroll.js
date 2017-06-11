@@ -16,13 +16,13 @@ var {
     TouchableHighlight,
     View
     } = ReactNative;
-import CameraRollView from '../modules/CameraRollView.js';
+import CameraRollView from '../components/CameraRollView.js';
+import PhotoSelector from '../modules/PhotoSelector.js';
 
 export default class CameralRollPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            groupTypes:"SavedPhotos",
             imageMargin: 4
         }
     }
@@ -37,13 +37,8 @@ export default class CameralRollPage extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <CameraRollView
-                                batchSize={16}
-                                imagesPerRow={4}
-                                assetType="Photos"
-                                groupTypes={this.state.groupTypes}
-                    >
-                </CameraRollView>
+                <PhotoSelector>
+                </PhotoSelector>
             </View>
         );
     }

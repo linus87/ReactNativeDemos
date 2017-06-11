@@ -57,6 +57,10 @@ var propTypes = {
         'All',
     ]),
 
+    /**
+     * Properties to be added on Image component.
+     */
+    imageProps: React.PropTypes.array
 };
 
 var CameraRollView = React.createClass({
@@ -67,16 +71,18 @@ var CameraRollView = React.createClass({
         let imagesPerRow = 4, imageMargin = 4;
 
         return {
-            groupTypes: 'SavedPhotos',
+            groupTypes: 'All',
             batchSize: 5,
             imagesPerRow: imagesPerRow,
             imageMargin: imageMargin,
             assetType: 'Photos',
-            renderImage: function(asset) {
+            imageProps: null,
+            renderImage: function(asset, props) {
+                let {imagesPerRow, imageMargin, imageProps} = props;
                 let imageWidth = (width - (imagesPerRow + 1) * imageMargin ) / imagesPerRow;
                 var imageStyle = [styles.image, {width: imageWidth, height: imageWidth}];
                 return (
-                    <Image source={asset.node.image} style={imageStyle} />
+                    <Image key={asset.node.image.uri} source={asset.node.image} style={imageStyle} {...imageProps}/>
                 );
             },
         };
@@ -193,7 +199,7 @@ var CameraRollView = React.createClass({
             if (image === null) {
                 return null;
             }
-            return this.props.renderImage(image, this.props.imagesPerRow);
+            return this.props.renderImage(image, this.props);
         });
 
         return (
